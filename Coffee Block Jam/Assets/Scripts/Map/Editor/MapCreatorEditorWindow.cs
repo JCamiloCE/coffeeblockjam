@@ -7,9 +7,11 @@ namespace CoffeeBlockJam
     {
         private int _gridWidth = 10;
         private int _gridHeight = 10;
-        private Sprite _floorSprite;
-        private int _spriteCellSize = 1;
+        private Sprite _floorSpriteA;
+        private Sprite _floorSpriteB;
         private float _sizeForPreview = 100f;
+        private float _offsetForX = 2.5f;
+        private float _offsetForY = 2.5f;
 
         [MenuItem("Tools/MapCreatorEditorWindow")]
         public static void OpenMapCreatorWin()
@@ -23,9 +25,10 @@ namespace CoffeeBlockJam
 
             GUILayout.Label("Map Creator", EditorStyles.boldLabel);
             GUILayout.Label("Floor Sprite", EditorStyles.boldLabel);
-            _floorSprite = (Sprite)EditorGUILayout.ObjectField("Sprite", _floorSprite, typeof(Sprite), false);
+            _floorSpriteA = (Sprite)EditorGUILayout.ObjectField("Sprite", _floorSpriteA, typeof(Sprite), false);
+            _floorSpriteB = (Sprite)EditorGUILayout.ObjectField("Sprite", _floorSpriteB, typeof(Sprite), false);
 
-            if (_floorSprite == null) 
+            if (_floorSpriteA == null || _floorSpriteB == null) 
             {
                 GUILayout.Label("Floor Sprite should be assign", EditorStyles.boldLabel);
                 return;
@@ -34,15 +37,10 @@ namespace CoffeeBlockJam
             EditorGUILayout.Space();
 
             GUILayout.Label("Configuration grid", EditorStyles.boldLabel);
-            _spriteCellSize = EditorGUILayout.IntField("Size per sprite", _spriteCellSize);
             _gridWidth = EditorGUILayout.IntField("Width", _gridWidth);
             _gridHeight = EditorGUILayout.IntField("Height", _gridHeight);
 
-            if (AreGridConditionCompleted())
-            {
-                GUILayout.Label("Error in grid width, height and sprite cell size", EditorStyles.boldLabel);
-                return;
-            }
+            
 
             EditorGUILayout.Space();
 
@@ -54,15 +52,15 @@ namespace CoffeeBlockJam
             Rect previewRect = GUILayoutUtility.GetRect(_gridWidth * _sizeForPreview, _gridHeight * _sizeForPreview);
             HandleMouseInput(previewRect);
             DrawGridPreview(previewRect);
-        }
 
-        private bool AreGridConditionCompleted() 
-        {
-            return _gridWidth % _spriteCellSize != 0 ||
-                _gridHeight % _spriteCellSize != 0 ||
-                _gridWidth < _spriteCellSize ||
-                _gridHeight < _spriteCellSize ||
-                _gridWidth != _gridHeight;
+            EditorGUILayout.Space();
+
+            _offsetForX = EditorGUILayout.FloatField("Off set for X in scene", _offsetForX);
+            _offsetForY = EditorGUILayout.FloatField("Off set for Y in scene", _offsetForY);
+            if (GUILayout.Button("Generate In Scene"))
+            {
+                GenerateGridInScene();
+            }
         }
 
         private void HandleMouseInput(Rect rect)
@@ -108,27 +106,82 @@ namespace CoffeeBlockJam
 
         private void DrawFloorSprites(Rect rect)
         {
-            if (_floorSprite != null)
+            Texture2D textureA = AssetPreview.GetAssetPreview(_floorSpriteA);
+            Texture2D textureB = AssetPreview.GetAssetPreview(_floorSpriteB);
+            Texture2D currentTexture = textureA;
+            bool nextTextureIsA = true;
+            if (textureA != null && textureB != null)
             {
-                Texture2D texture = AssetPreview.GetAssetPreview(_floorSprite);
-                if (texture != null)
+                for (int y = 0; y < _gridHeight; y ++)
                 {
-                    for (int y = 0; y < _gridHeight; y += _spriteCellSize)
+                    for (int x = 0; x < _gridWidth; x ++)
                     {
-                        for (int x = 0; x < _gridWidth; x += _spriteCellSize)
+                        if (x <= _gridWidth && y <= _gridHeight)
                         {
-                            if (x + _spriteCellSize <= _gridWidth && y + _spriteCellSize <= _gridHeight)
-                            {
-                                Rect spriteRect = new Rect(
-                                    rect.x + x * _sizeForPreview,
-                                    rect.y + y * _sizeForPreview,
-                                    _spriteCellSize * _sizeForPreview,
-                                    _spriteCellSize * _sizeForPreview);
+                            Rect spriteRect = new Rect(
+                                rect.x + x * _sizeForPreview,
+                                rect.y + y * _sizeForPreview,
+                                _sizeForPreview,
+                                _sizeForPreview);
 
-                                GUI.DrawTexture(spriteRect, texture, ScaleMode.StretchToFill, true);
-                            }
+                            currentTexture = nextTextureIsA ? textureA : textureB;
+                            nextTextureIsA = !nextTextureIsA;
+                            GUI.DrawTexture(spriteRect, currentTexture, ScaleMode.StretchToFill, true);
                         }
                     }
+                    if (_gridWidth % 2 == 0)
+                    { 
+                        nextTextureIsA = !nextTextureIsA; 
+                    }
+                }
+            }
+        }
+
+        private void GenerateGridInScene()
+        {
+            GameObject root = new GameObject("Generated_Grid");
+            GameObject art = new GameObject("ArtGrid");
+            GameObject logic = new GameObject("LogicGrid");
+            art.transform.SetParent(root.transform);
+            logic.transform.SetParent(root.transform);
+            GenerateArtForGrid(art);
+            GenerateLogicSpots(logic);
+        }
+
+        private void GenerateArtForGrid(GameObject art) 
+        {
+            bool nextTextureIsA = true;
+            for (int y = 0; y < _gridHeight; y ++)
+            {
+                for (int x = 0; x < _gridWidth; x ++)
+                {
+                    if (x <= _gridWidth && y <= _gridHeight)
+                    {
+                        GameObject tileArt = new GameObject($"Tile_{x}_{y}");
+                        tileArt.transform.position = new Vector3(x * _offsetForX, -y * _offsetForY, 0f);
+                        tileArt.transform.SetParent(art.transform);
+
+                        SpriteRenderer renderer = tileArt.AddComponent<SpriteRenderer>();
+                        renderer.sprite = nextTextureIsA ? _floorSpriteA : _floorSpriteB;
+                        nextTextureIsA = !nextTextureIsA;
+                    }
+                }
+                if (_gridWidth % 2 == 0)
+                {
+                    nextTextureIsA = !nextTextureIsA;
+                }
+            }
+        }
+
+        private void GenerateLogicSpots(GameObject logic) 
+        {
+            for (int y = 0; y < _gridHeight; y++)
+            {
+                for (int x = 0; x < _gridWidth; x++)
+                {
+                    GameObject tileArt = new GameObject($"Tile_{x}_{y}");
+                    tileArt.transform.position = new Vector3(x * _offsetForX, -y * _offsetForY, 0f);
+                    tileArt.transform.SetParent(logic.transform);
                 }
             }
         }
