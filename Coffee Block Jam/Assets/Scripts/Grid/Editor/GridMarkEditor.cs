@@ -1,7 +1,7 @@
 using Enums;
 using UnityEngine;
 
-namespace CoffeeBlockJam.Map.Editor
+namespace CoffeeBlockJam.Grid.Editor
 { 
     [System.Serializable]
     public class GridMarkEditor

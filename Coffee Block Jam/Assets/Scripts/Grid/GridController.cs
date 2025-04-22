@@ -2,7 +2,7 @@ using CoffeeBlockJam.Trays;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CoffeeBlockJam.Map
+namespace CoffeeBlockJam.Grid
 {
     public class GridController : MonoBehaviour
     {

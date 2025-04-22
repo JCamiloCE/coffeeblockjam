@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CoffeeBlockJam.Map.Editor 
+namespace CoffeeBlockJam.Grid.Editor 
 {
     public class MapCreatorEditorWindow : EditorWindow
     {

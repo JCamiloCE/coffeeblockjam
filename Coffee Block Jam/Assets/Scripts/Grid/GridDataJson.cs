@@ -1,4 +1,4 @@
-namespace CoffeeBlockJam.Map 
+namespace CoffeeBlockJam.Grid 
 {
     [System.Serializable]
     public class GridDataJson

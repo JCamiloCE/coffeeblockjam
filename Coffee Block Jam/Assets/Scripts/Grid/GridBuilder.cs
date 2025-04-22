@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CoffeeBlockJam.Map
+namespace CoffeeBlockJam.Grid
 {
     public class GridBuilder
     {
