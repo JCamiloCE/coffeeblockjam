@@ -12,8 +12,8 @@ namespace CoffeeBlockJam.Map.Editor
         private Sprite _floorSpriteA;
         private Sprite _floorSpriteB;
         private float _sizeForPreview = 100f;
-        private float _offsetForX = 2.5f;
-        private float _offsetForY = 2.5f;
+        private float _offsetForX = 1f;
+        private float _offsetForY = 1f;
         private bool _showingPreview = false;
         private List<GridMarkEditor> _marks = new List<GridMarkEditor>();
         private EColorTray _currentMarkColor = EColorTray.None;
@@ -36,7 +36,14 @@ namespace CoffeeBlockJam.Map.Editor
                 ShowPreview();
             }
 
-            ShowToGenerateInScene();
+            if (_isValidGrid)
+            {
+                ShowToGenerateInScene();
+            }
+            else
+            {
+                ShowValidGridSection();
+            }
         }
 
         private void ShowBasicGridConfiguration() 
@@ -207,77 +214,39 @@ namespace CoffeeBlockJam.Map.Editor
         {
             EditorGUILayout.Space();
 
-            if (_isValidGrid)
+            GUILayout.Label("In Scene", EditorStyles.boldLabel);
+
+            _offsetForX = EditorGUILayout.FloatField("Off set for X in scene", _offsetForX);
+            _offsetForY = EditorGUILayout.FloatField("Off set for Y in scene", _offsetForY);
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Generate In Scene"))
             {
-                GUILayout.Label("In Scene", EditorStyles.boldLabel);
-
-                _offsetForX = EditorGUILayout.FloatField("Off set for X in scene", _offsetForX);
-                _offsetForY = EditorGUILayout.FloatField("Off set for Y in scene", _offsetForY);
-
-                EditorGUILayout.Space();
-
-                if (GUILayout.Button("Generate In Scene"))
-                {
-                    GenerateGridInScene();
-                }
-            }
-            else 
-            {
-                ShowValidGridSection();
+                GenerateGridInScene();
             }
         }
 
         private void GenerateGridInScene()
         {
-            GameObject root = new GameObject("Generated_Grid");
-            GameObject art = new GameObject("ArtGrid");
-            GameObject logic = new GameObject("LogicGrid");
-            art.transform.SetParent(root.transform);
-            logic.transform.SetParent(root.transform);
-            GenerateArtForGrid(art);
-            GenerateLogicSpots(logic);
-        }
-
-        private void GenerateArtForGrid(GameObject art) 
-        {
-            bool nextTextureIsA = true;
-            for (int y = 0; y < _gridHeight; y ++)
+            GridDataJson data = new GridDataJson
             {
-                for (int x = 0; x < _gridWidth; x ++)
-                {
-                    if (x <= _gridWidth && y <= _gridHeight)
-                    {
-                        GameObject tileArt = new GameObject($"Tile_{x}_{y}");
-                        tileArt.transform.position = new Vector3(x * _offsetForX, -y * _offsetForY, 0f);
-                        tileArt.transform.SetParent(art.transform);
+                width = _gridWidth,
+                height = _gridHeight,
+                offsetX = _offsetForX,
+                offsetY = _offsetForY
+            };
 
-                        SpriteRenderer renderer = tileArt.AddComponent<SpriteRenderer>();
-                        renderer.sprite = nextTextureIsA ? _floorSpriteA : _floorSpriteB;
-                        nextTextureIsA = !nextTextureIsA;
-                    }
-                }
-                if (_gridWidth % 2 == 0)
-                {
-                    nextTextureIsA = !nextTextureIsA;
-                }
-            }
-        }
-
-        private void GenerateLogicSpots(GameObject logic) 
-        {
-            for (int y = 0; y < _gridHeight; y++)
-            {
-                for (int x = 0; x < _gridWidth; x++)
-                {
-                    GameObject tileArt = new GameObject($"Tile_{x}_{y}");
-                    tileArt.transform.position = new Vector3(x * _offsetForX, -y * _offsetForY, 0f);
-                    tileArt.transform.SetParent(logic.transform);
-                }
-            }
+            string json = JsonUtility.ToJson(data);
+            GridController gridController = FindObjectOfType<GridController>();
+            gridController.BuildGridAndTrays(json);
+            System.IO.File.WriteAllText("Assets/GridsJson/gridData.json", json);
         }
 
         private void ShowValidGridSection() 
         {
+            EditorGUILayout.Space();
+
             if (GUILayout.Button("Validate Grid"))
             {
                 _currentErrorInValidation = string.Empty;
