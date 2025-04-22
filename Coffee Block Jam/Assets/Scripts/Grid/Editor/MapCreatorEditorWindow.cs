@@ -15,7 +15,7 @@ namespace CoffeeBlockJam.Grid.Editor
         private float _offsetForX = 1f;
         private float _offsetForY = 1f;
         private bool _showingPreview = false;
-        private List<GridMarkEditor> _marks = new List<GridMarkEditor>();
+        private List<CellDataJson> _marks = new List<CellDataJson>();
         private EColorTray _currentMarkColor = EColorTray.None;
         private int _currentMarkID = 0;
         private bool _isValidGrid = false;
@@ -34,15 +34,14 @@ namespace CoffeeBlockJam.Grid.Editor
             if (_showingPreview)
             {
                 ShowPreview();
-            }
-
-            if (_isValidGrid)
-            {
-                ShowToGenerateInScene();
-            }
-            else
-            {
-                ShowValidGridSection();
+                if (_isValidGrid)
+                {
+                    ShowToGenerateInScene();
+                }
+                else
+                {
+                    ShowValidGridSection();
+                }
             }
         }
 
@@ -110,14 +109,14 @@ namespace CoffeeBlockJam.Grid.Editor
                 {
                     Vector2Int gridPos = new Vector2Int(mouseX, mouseY);
 
-                    GridMarkEditor existing = _marks.Find(mark => mark.position == gridPos);
+                    CellDataJson existing = _marks.Find(mark => mark.position == gridPos);
                     if (existing != null)
                     {
                         _marks.Remove(existing);
                     }
                     if (_currentMarkColor != EColorTray.None)
                     {
-                        _marks.Add(new GridMarkEditor(gridPos, _currentMarkColor, _currentMarkID));
+                        _marks.Add(new CellDataJson(gridPos, _currentMarkColor, _currentMarkID));
                     }
                     Repaint();
                     _isValidGrid = false;
@@ -234,7 +233,8 @@ namespace CoffeeBlockJam.Grid.Editor
                 width = _gridWidth,
                 height = _gridHeight,
                 offsetX = _offsetForX,
-                offsetY = _offsetForY
+                offsetY = _offsetForY,
+                cellsData = _marks
             };
 
             string json = JsonUtility.ToJson(data);
@@ -270,7 +270,7 @@ namespace CoffeeBlockJam.Grid.Editor
         {
             _isValidGrid = false;
             _showingPreview = false;
-            _marks = new List<GridMarkEditor>();
+            _marks = new List<CellDataJson>();
             _currentMarkColor = EColorTray.None;
             _currentMarkID = 0;
         }
