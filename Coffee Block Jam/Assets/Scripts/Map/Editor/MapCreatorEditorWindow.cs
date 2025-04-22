@@ -1,7 +1,9 @@
+using Enums;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace CoffeeBlockJam 
+namespace CoffeeBlockJam.Map.Editor 
 {
     public class MapCreatorEditorWindow : EditorWindow
     {
@@ -12,6 +14,12 @@ namespace CoffeeBlockJam
         private float _sizeForPreview = 100f;
         private float _offsetForX = 2.5f;
         private float _offsetForY = 2.5f;
+        private bool _showingPreview = false;
+        private List<GridMarkEditor> _marks = new List<GridMarkEditor>();
+        private EColorTray _currentMarkColor = EColorTray.None;
+        private int _currentMarkID = 0;
+        private bool _isValidGrid = false;
+        private string _currentErrorInValidation = string.Empty;
 
         [MenuItem("Tools/MapCreatorEditorWindow")]
         public static void OpenMapCreatorWin()
@@ -21,14 +29,27 @@ namespace CoffeeBlockJam
 
         private void OnGUI()
         {
+            ShowBasicGridConfiguration();
+
+            if (_showingPreview)
+            {
+                ShowPreview();
+            }
+
+            ShowToGenerateInScene();
+        }
+
+        private void ShowBasicGridConfiguration() 
+        {
             EditorGUILayout.Space();
 
+            EditorGUI.BeginChangeCheck();
             GUILayout.Label("Map Creator", EditorStyles.boldLabel);
             GUILayout.Label("Floor Sprite", EditorStyles.boldLabel);
             _floorSpriteA = (Sprite)EditorGUILayout.ObjectField("Sprite", _floorSpriteA, typeof(Sprite), false);
             _floorSpriteB = (Sprite)EditorGUILayout.ObjectField("Sprite", _floorSpriteB, typeof(Sprite), false);
 
-            if (_floorSpriteA == null || _floorSpriteB == null) 
+            if (_floorSpriteA == null || _floorSpriteB == null)
             {
                 GUILayout.Label("Floor Sprite should be assign", EditorStyles.boldLabel);
                 return;
@@ -39,9 +60,19 @@ namespace CoffeeBlockJam
             GUILayout.Label("Configuration grid", EditorStyles.boldLabel);
             _gridWidth = EditorGUILayout.IntField("Width", _gridWidth);
             _gridHeight = EditorGUILayout.IntField("Height", _gridHeight);
+            if (EditorGUI.EndChangeCheck()) 
+            {
+                ResetByChangeBaseConfiguration();
+            }
 
-            
+            if (!_showingPreview && GUILayout.Button("Show Preview"))
+            {
+                _showingPreview = true;
+            }
+        }
 
+        private void ShowPreview()
+        {
             EditorGUILayout.Space();
 
             GUILayout.Label("Preview", EditorStyles.boldLabel);
@@ -49,18 +80,15 @@ namespace CoffeeBlockJam
 
             EditorGUILayout.Space();
 
-            Rect previewRect = GUILayoutUtility.GetRect(_gridWidth * _sizeForPreview, _gridHeight * _sizeForPreview);
-            HandleMouseInput(previewRect);
-            DrawGridPreview(previewRect);
+            GUILayout.Label("Mark Tool", EditorStyles.boldLabel);
+            _currentMarkColor = (EColorTray)EditorGUILayout.EnumPopup("Mark Color", _currentMarkColor);
+            _currentMarkID = EditorGUILayout.IntField("Mark ID", _currentMarkID);
 
             EditorGUILayout.Space();
 
-            _offsetForX = EditorGUILayout.FloatField("Off set for X in scene", _offsetForX);
-            _offsetForY = EditorGUILayout.FloatField("Off set for Y in scene", _offsetForY);
-            if (GUILayout.Button("Generate In Scene"))
-            {
-                GenerateGridInScene();
-            }
+            Rect previewRect = GUILayoutUtility.GetRect(_gridWidth * _sizeForPreview, _gridHeight * _sizeForPreview);
+            HandleMouseInput(previewRect);
+            DrawGridPreview(previewRect);
         }
 
         private void HandleMouseInput(Rect rect)
@@ -73,7 +101,19 @@ namespace CoffeeBlockJam
 
                 if (mouseX >= 0 && mouseX < _gridWidth && mouseY >= 0 && mouseY < _gridHeight)
                 {
-                    Debug.Log("Grilla tocada mouseX " + mouseX + " mouseY " + mouseY);
+                    Vector2Int gridPos = new Vector2Int(mouseX, mouseY);
+
+                    GridMarkEditor existing = _marks.Find(mark => mark.position == gridPos);
+                    if (existing != null)
+                    {
+                        _marks.Remove(existing);
+                    }
+                    if (_currentMarkColor != EColorTray.None)
+                    {
+                        _marks.Add(new GridMarkEditor(gridPos, _currentMarkColor, _currentMarkID));
+                    }
+                    Repaint();
+                    _isValidGrid = false;
                 }
             }
         }
@@ -83,25 +123,10 @@ namespace CoffeeBlockJam
             Handles.BeginGUI();
 
             DrawFloorSprites(rect);
-            DrawGrid(rect);
+            DrawGridBorders(rect);
+            DrawMarks(rect);
 
             Handles.EndGUI();
-        }
-
-        private void DrawGrid(Rect rect)
-        {
-            for (int y = 0; y < _gridHeight; y++)
-            {
-                for (int x = 0; x < _gridWidth; x++)
-                {
-                    Rect cellRect = new Rect(
-                        rect.x + x * _sizeForPreview,
-                        rect.y + y * _sizeForPreview,
-                        _sizeForPreview, _sizeForPreview);
-
-                    Handles.DrawSolidRectangleWithOutline(cellRect, new Color(0, 0, 0, 0), Color.gray);
-                }
-            }
         }
 
         private void DrawFloorSprites(Rect rect)
@@ -134,6 +159,71 @@ namespace CoffeeBlockJam
                         nextTextureIsA = !nextTextureIsA; 
                     }
                 }
+            }
+        }
+
+        private void DrawGridBorders(Rect rect)
+        {
+            for (int y = 0; y < _gridHeight; y++)
+            {
+                for (int x = 0; x < _gridWidth; x++)
+                {
+                    Rect cellRect = new Rect(
+                        rect.x + x * _sizeForPreview,
+                        rect.y + y * _sizeForPreview,
+                        _sizeForPreview, _sizeForPreview);
+
+                    Handles.DrawSolidRectangleWithOutline(cellRect, new Color(0, 0, 0, 0), Color.gray);
+                }
+            }
+        }
+
+        private void DrawMarks(Rect rect)
+        {
+            foreach (var mark in _marks)
+            {
+                Vector2 cellPos = new Vector2(
+                    rect.x + mark.position.x * _sizeForPreview,
+                    rect.y + mark.position.y * _sizeForPreview
+                );
+
+                Rect circleRect = new Rect(cellPos.x + 5, cellPos.y + 5, _sizeForPreview - 10, _sizeForPreview - 10);
+
+                Handles.color = mark.color;
+                Handles.DrawSolidDisc(cellPos + new Vector2(_sizeForPreview / 2, _sizeForPreview / 2), Vector3.forward, _sizeForPreview * 0.3f);
+
+                GUIStyle style = new GUIStyle(GUI.skin.label)
+                {
+                    normal = new GUIStyleState { textColor = Color.white },
+                    alignment = TextAnchor.MiddleCenter,
+                    fontStyle = FontStyle.Bold
+                };
+
+                GUI.Label(circleRect, mark.id.ToString(), style);
+            }
+        }
+
+        private void ShowToGenerateInScene()
+        {
+            EditorGUILayout.Space();
+
+            if (_isValidGrid)
+            {
+                GUILayout.Label("In Scene", EditorStyles.boldLabel);
+
+                _offsetForX = EditorGUILayout.FloatField("Off set for X in scene", _offsetForX);
+                _offsetForY = EditorGUILayout.FloatField("Off set for Y in scene", _offsetForY);
+
+                EditorGUILayout.Space();
+
+                if (GUILayout.Button("Generate In Scene"))
+                {
+                    GenerateGridInScene();
+                }
+            }
+            else 
+            {
+                ShowValidGridSection();
             }
         }
 
@@ -184,6 +274,36 @@ namespace CoffeeBlockJam
                     tileArt.transform.SetParent(logic.transform);
                 }
             }
+        }
+
+        private void ShowValidGridSection() 
+        {
+            if (GUILayout.Button("Validate Grid"))
+            {
+                _currentErrorInValidation = string.Empty;
+                _isValidGrid = false;
+                if (_marks == null || _marks.Count == 0)
+                {
+                    _currentErrorInValidation = "You need at least one Mark";
+                    return;
+                }
+
+                _isValidGrid = true;
+            }
+            if (!string.IsNullOrEmpty(_currentErrorInValidation))
+            {
+                GUI.contentColor = Color.red;
+                GUILayout.Label("Error: " + _currentErrorInValidation);
+            }
+        }
+
+        private void ResetByChangeBaseConfiguration() 
+        {
+            _isValidGrid = false;
+            _showingPreview = false;
+            _marks = new List<GridMarkEditor>();
+            _currentMarkColor = EColorTray.None;
+            _currentMarkID = 0;
         }
     }
 }
