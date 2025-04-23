@@ -12,6 +12,7 @@ namespace CoffeeBlockJam.Grid
         private int _gridHeight = 1;
         private List<ITray> _trays = null;
         private GridBuilder _gridBuilder = null;
+        private TraysBuilder _traysBuilder = null;
 
         public void BuildGridAndTrays(string dataInJson)
         {
@@ -19,8 +20,10 @@ namespace CoffeeBlockJam.Grid
 
             _gridWidth = loadedData.width;
             _gridHeight = loadedData.height;
-            _gridBuilder = new GridBuilder();
+            _gridBuilder = new ();
             _gridBuilder.CreateGrid(_gridWidth, _gridHeight, loadedData.offsetX, loadedData.offsetY, transform, _floorSpriteA, _floorSpriteB);
+            _traysBuilder = new ();
+            _traysBuilder.CreateTrays(loadedData, new TraySecionRulesImpl(), transform);
         }
     }
 }
