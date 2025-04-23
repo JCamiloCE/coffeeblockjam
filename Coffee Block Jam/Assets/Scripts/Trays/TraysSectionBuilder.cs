@@ -36,7 +36,7 @@ namespace CoffeeBlockJam.Trays
             logic.transform.SetParent(parent);
             foreach (CellDataJson cellData in loadedData.cellsData)
             {
-                NeighborsCellData neighborsCellData = new (loadedData, cellData.position);
+                NeighborsCellData neighborsCellData = new (loadedData, cellData);
                 (ETypeTray, float) tuple = _traySectionRules.GetTrayTypeWithRotation(neighborsCellData);
                 ITraySection traySection = InstantiateTraysection(tuple.Item1, tuple.Item2, cellData.position, logic.transform, loadedData.offsetX, loadedData.offsetY);
                 traySection.SetTraySectionData(cellData.color, cellData.id);

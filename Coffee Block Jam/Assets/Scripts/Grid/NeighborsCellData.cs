@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace CoffeeBlockJam.Grid
@@ -16,33 +17,38 @@ namespace CoffeeBlockJam.Grid
         public bool GetRightNeighbor => _rightNeighbor;
         public int GetNumberOfWalls => _walls;
 
-        public NeighborsCellData (GridDataJson loadedData, Vector2Int currentPosition)
+        public NeighborsCellData (GridDataJson loadedData, CellDataJson currentCell)
         {
-            FillNeighborsData(loadedData, currentPosition);
+            FillNeighborsData(loadedData, currentCell);
             SetWalls();
         }
 
-        private void FillNeighborsData(GridDataJson loadedData, Vector2Int currentPosition) 
+        private void FillNeighborsData(GridDataJson loadedData, CellDataJson currentCell) 
         {
             Vector2Int neighborPos = Vector2Int.zero;
+            Vector2Int currentPosition = currentCell.position;
+            int currentId = currentCell.id;
+            Color currentColor = currentCell.color;//This can be improve to use the Enum
             //check _upNeighbor
             neighborPos = new Vector2Int(currentPosition.x, currentPosition.y - 1);
-            _upNeighbor = CheckNeighbor(loadedData, neighborPos);
+            _upNeighbor = CheckNeighbor(loadedData, neighborPos, currentId, currentColor);
             //check _downNeighbor
             neighborPos = new Vector2Int(currentPosition.x, currentPosition.y + 1);
-            _downNeighbor = CheckNeighbor(loadedData, neighborPos);
+            _downNeighbor = CheckNeighbor(loadedData, neighborPos, currentId, currentColor);
             //check _leftNeighbor
             neighborPos = new Vector2Int(currentPosition.x - 1, currentPosition.y);
-            _leftNeighbor = CheckNeighbor(loadedData, neighborPos);
+            _leftNeighbor = CheckNeighbor(loadedData, neighborPos, currentId, currentColor);
             //check _rightNeighbor
             neighborPos = new Vector2Int(currentPosition.x + 1, currentPosition.y);
-            _rightNeighbor = CheckNeighbor(loadedData, neighborPos);
+            _rightNeighbor = CheckNeighbor(loadedData, neighborPos, currentId, currentColor);
         }
 
-        private bool CheckNeighbor(GridDataJson loadedData, Vector2Int neighborPos)
+        private bool CheckNeighbor(GridDataJson loadedData, Vector2Int neighborPos, int currentId, Color currentColor)
         {
-            CellDataJson cellData = loadedData.cellsData.Find(x => x.position == neighborPos);
-            return cellData != null;
+            CellDataJson neighborData = loadedData.cellsData.Find(x => x.position == neighborPos && 
+                                                                  x.id == currentId &&
+                                                                  x.color == currentColor);
+            return neighborData != null;
         }
 
         private void SetWalls()
