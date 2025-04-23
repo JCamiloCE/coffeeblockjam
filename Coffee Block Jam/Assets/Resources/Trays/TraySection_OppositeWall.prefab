@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _typeTray: 141515
+  _meshRender: {fileID: 6926444900783299234}
 --- !u!1001 &8637404158236001830
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -103,6 +104,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7321b6672e70b2446a6b7e3e278b243c, type: 3}
+--- !u!23 &6926444900783299234 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 7321b6672e70b2446a6b7e3e278b243c, type: 3}
+  m_PrefabInstance: {fileID: 8637404158236001830}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8094235360376054221 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7321b6672e70b2446a6b7e3e278b243c, type: 3}

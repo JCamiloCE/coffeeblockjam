@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CoffeeBlockJam.Trays
 {
-    public class TraysBuilder 
+    public class TraysSectionBuilder 
     {
         private string _pathTrays = "Trays";
         private ITraySectionRules _traySectionRules = null;
@@ -38,11 +38,12 @@ namespace CoffeeBlockJam.Trays
             {
                 NeighborsCellData neighborsCellData = new (loadedData, cellData.position);
                 (ETypeTray, float) tuple = _traySectionRules.GetTrayTypeWithRotation(neighborsCellData);
-                InstantiateTraysection(tuple.Item1, tuple.Item2, cellData.position, logic.transform, loadedData.offsetX, loadedData.offsetY);
+                ITraySection traySection = InstantiateTraysection(tuple.Item1, tuple.Item2, cellData.position, logic.transform, loadedData.offsetX, loadedData.offsetY);
+                traySection.SetTraySectionData(cellData.color, cellData.id);
             }
         }
 
-        private void InstantiateTraysection(ETypeTray typeTray, float rotation, Vector2Int position, Transform parent, float offsetX, float offsetY) 
+        private ITraySection InstantiateTraysection(ETypeTray typeTray, float rotation, Vector2Int position, Transform parent, float offsetX, float offsetY) 
         {
             foreach (KeyValuePair<ITraySection, GameObject> tray in _traysPerType)
             {
@@ -52,9 +53,10 @@ namespace CoffeeBlockJam.Trays
                     instance.transform.localPosition = new Vector3(position.x * offsetX, -position.y * offsetY, -0.2f);
                     instance.transform.SetParent(parent);
                     instance.transform.GetChild(0).localRotation = Quaternion.Euler(0,rotation,0);
-                    return;
+                    return instance.GetComponent<ITraySection>();
                 }
             }
+            return null;
         }
     }
 }
