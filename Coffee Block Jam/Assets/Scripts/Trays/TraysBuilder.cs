@@ -36,30 +36,10 @@ namespace CoffeeBlockJam.Trays
             logic.transform.SetParent(parent);
             foreach (CellDataJson cellData in loadedData.cellsData)
             {
-                NeighborsCellData neighborsCellData = CreateNeighborsData(loadedData, cellData.position);
+                NeighborsCellData neighborsCellData = new (loadedData, cellData.position);
                 (ETypeTray, float) tuple = _traySectionRules.GetTrayTypeWithRotation(neighborsCellData);
                 InstantiateTraysection(tuple.Item1, tuple.Item2, cellData.position, logic.transform, loadedData.offsetX, loadedData.offsetY);
             }
-        }
-
-        private NeighborsCellData CreateNeighborsData(GridDataJson loadedData, Vector2Int currentPosition) 
-        {
-            NeighborsCellData neighborsCellData = new ();
-            Vector2Int neighborPos = Vector2Int.zero;
-            //check up
-            neighborPos = new Vector2Int(currentPosition.x, currentPosition.y - 1);
-            neighborsCellData.up = CheckNeighbor(loadedData, neighborPos);
-            //check down
-            neighborPos = new Vector2Int(currentPosition.x, currentPosition.y + 1);
-            neighborsCellData.down = CheckNeighbor(loadedData, neighborPos);
-            //check left
-            neighborPos = new Vector2Int(currentPosition.x - 1, currentPosition.y);
-            neighborsCellData.left = CheckNeighbor(loadedData, neighborPos);
-            //check right
-            neighborPos = new Vector2Int(currentPosition.x + 1, currentPosition.y);
-            neighborsCellData.right = CheckNeighbor(loadedData, neighborPos);
-
-            return neighborsCellData;
         }
 
         private void InstantiateTraysection(ETypeTray typeTray, float rotation, Vector2Int position, Transform parent, float offsetX, float offsetY) 
@@ -75,12 +55,6 @@ namespace CoffeeBlockJam.Trays
                     return;
                 }
             }
-        }
-
-        private bool CheckNeighbor(GridDataJson loadedData, Vector2Int neighborPos) 
-        {
-            CellDataJson cellData = loadedData.cellsData.Find(x => x.position == neighborPos);
-            return cellData != null;
         }
     }
 }

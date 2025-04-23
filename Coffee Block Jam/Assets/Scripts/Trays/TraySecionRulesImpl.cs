@@ -7,7 +7,7 @@ namespace CoffeeBlockJam.Trays
     {
         (ETypeTray, float) ITraySectionRules.GetTrayTypeWithRotation(NeighborsCellData neighborsCellData)
         {
-            int numberOfWalls = GetNumberOfWalls(neighborsCellData);
+            int numberOfWalls = neighborsCellData.GetNumberOfWalls;
             ETypeTray typeTray = GetTypeOfTrayByWalls(numberOfWalls);
             if (typeTray == ETypeTray.Invalid) 
             {
@@ -16,15 +16,7 @@ namespace CoffeeBlockJam.Trays
             return (typeTray, GetRotation(typeTray, neighborsCellData));
         }
 
-        private int GetNumberOfWalls(NeighborsCellData neighborsCellData) 
-        {
-            int counterWalls = 0;
-            counterWalls = counterWalls + (neighborsCellData.up ? 0 : 1);
-            counterWalls = counterWalls + (neighborsCellData.down ? 0 : 1);
-            counterWalls = counterWalls + (neighborsCellData.left ? 0 : 1);
-            counterWalls = counterWalls + (neighborsCellData.right ? 0 : 1);
-            return counterWalls;
-        }
+        
 
         private ETypeTray GetTypeOfTrayByWalls(int numberOfWalls) 
         {
@@ -40,8 +32,8 @@ namespace CoffeeBlockJam.Trays
         {
             if (numberOfWalls == 2) 
             {
-                if(neighborsCellData.up == true && neighborsCellData.down == true) return ETypeTray.OppositeWall;
-                if(neighborsCellData.left == true && neighborsCellData.right == true) return ETypeTray.OppositeWall;
+                if(neighborsCellData.GetUpNeighbor == true && neighborsCellData.GetDownNeighbor == true) return ETypeTray.OppositeWall;
+                if(neighborsCellData.GetLeftNeighbor == true && neighborsCellData.GetRightNeighbor == true) return ETypeTray.OppositeWall;
                 return ETypeTray.TwoWalls;
             }
 
@@ -59,31 +51,31 @@ namespace CoffeeBlockJam.Trays
 
         private float GetRotationForTrayOneWall(NeighborsCellData neighborsCellData) 
         {
-            if (!neighborsCellData.left) return 90f;
-            if (!neighborsCellData.up) return 180f;
-            if (!neighborsCellData.right) return 270f;
+            if (!neighborsCellData.GetLeftNeighbor) return 90f;
+            if (!neighborsCellData.GetUpNeighbor) return 180f;
+            if (!neighborsCellData.GetRightNeighbor) return 270f;
             return 0f;
         }
 
         private float GetRotationForTrayTwoWall(NeighborsCellData neighborsCellData)
         {
-            if (!neighborsCellData.left && !neighborsCellData.up) return 90f;
-            if (!neighborsCellData.up && !neighborsCellData.right) return -180f;
-            if (!neighborsCellData.right && !neighborsCellData.down) return 270f;
+            if (!neighborsCellData.GetLeftNeighbor && !neighborsCellData.GetUpNeighbor) return 90f;
+            if (!neighborsCellData.GetUpNeighbor && !neighborsCellData.GetRightNeighbor) return -180f;
+            if (!neighborsCellData.GetRightNeighbor && !neighborsCellData.GetDownNeighbor) return 270f;
             return 0f;
         }
 
         private float GetRotationForTrayThreeWall(NeighborsCellData neighborsCellData)
         {
-            if (neighborsCellData.right) return 90f;
-            if (neighborsCellData.down) return 180f;
-            if (neighborsCellData.left ) return 270f;
+            if (neighborsCellData.GetRightNeighbor) return 90f;
+            if (neighborsCellData.GetDownNeighbor) return 180f;
+            if (neighborsCellData.GetLeftNeighbor) return 270f;
             return 0f;
         }
 
         private float GetRotationForOppositeWall(NeighborsCellData neighborsCellData)
         {
-            if (neighborsCellData.up && neighborsCellData.down) return 90f;
+            if (neighborsCellData.GetUpNeighbor && neighborsCellData.GetDownNeighbor) return 90f;
             return 0f;
         }
     }
