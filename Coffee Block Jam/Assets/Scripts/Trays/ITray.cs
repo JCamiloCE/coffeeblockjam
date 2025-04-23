@@ -5,7 +5,7 @@ namespace CoffeeBlockJam.Trays
 {
     public interface ITray
     {
-        public void SetDataForTray(List<int> indexInGrid, Color color);
-        public void CreateVisualTray(Transform parent);
+        public void Initialize();
+        public void AddTraySection(ITraySection traySection);
     }
 }

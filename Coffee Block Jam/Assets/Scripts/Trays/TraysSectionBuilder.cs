@@ -10,12 +10,14 @@ namespace CoffeeBlockJam.Trays
         private string _pathTrays = "Trays";
         private ITraySectionRules _traySectionRules = null;
         private Dictionary<ITraySection, GameObject> _traysPerType = null;
+        private List<ITraySection> _finalTraySections = null;
 
-        public void CreateTrays(GridDataJson loadedData, ITraySectionRules traySectionRules, Transform parent) 
+        public List<ITraySection> CreateTraySections(GridDataJson loadedData, ITraySectionRules traySectionRules, Transform parent) 
         {
             _traySectionRules = traySectionRules;
             LoadAllPossibleTrays();
             CreateTraysInScene(loadedData, parent);
+            return _finalTraySections;
         }
 
         private void LoadAllPossibleTrays() 
@@ -32,6 +34,7 @@ namespace CoffeeBlockJam.Trays
 
         private void CreateTraysInScene(GridDataJson loadedData, Transform parent) 
         {
+            _finalTraySections = new List<ITraySection>();
             GameObject logic = new GameObject("Logic");
             logic.transform.SetParent(parent);
             foreach (CellDataJson cellData in loadedData.cellsData)
@@ -40,6 +43,7 @@ namespace CoffeeBlockJam.Trays
                 (ETypeTray, float) tuple = _traySectionRules.GetTrayTypeWithRotation(neighborsCellData);
                 ITraySection traySection = InstantiateTraysection(tuple.Item1, tuple.Item2, cellData.position, logic.transform, loadedData.offsetX, loadedData.offsetY);
                 traySection.SetTraySectionData(cellData.color, cellData.id);
+                _finalTraySections.Add(traySection);
             }
         }
 

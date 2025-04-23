@@ -12,6 +12,8 @@ namespace CoffeeBlockJam.Trays
         private int _traySectionId = -1;
 
         ETypeTray ITraySection.GetTypeTray() => _typeTray;
+        Color ITraySection.GetColorTray() => _traySectionColor;
+        int ITraySection.GetIdTray() => _traySectionId;
 
         void ITraySection.SetTraySectionData(Color colorTraySection, int traySectionId)
         {
@@ -22,6 +24,11 @@ namespace CoffeeBlockJam.Trays
             {
                 _meshRender.materials[i].color = _traySectionColor;
             }
+        }
+
+        void ITraySection.SetParent(Transform parent)
+        {
+            transform.SetParent(parent);
         }
     }
 }
