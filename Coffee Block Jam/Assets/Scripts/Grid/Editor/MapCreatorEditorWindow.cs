@@ -239,7 +239,7 @@ namespace CoffeeBlockJam.Grid.Editor
 
             string json = JsonUtility.ToJson(data);
             GridController gridController = FindObjectOfType<GridController>();
-            gridController.BuildGridAndTrays(json);
+            gridController.BuildGridAndTrays(data);
             System.IO.File.WriteAllText("Assets/GridsJson/gridData.json", json);
         }
 

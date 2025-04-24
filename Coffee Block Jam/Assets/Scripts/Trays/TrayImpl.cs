@@ -7,7 +7,7 @@ namespace CoffeeBlockJam.Trays
     {
         private List<ITraySection> _traySections = null;
         private Rigidbody _rigidbody = null;
-        [SerializeField] private float _speed = 3f;
+        private float _speed = 15f;
         private Vector3 _delta = Vector3.zero;
 
         //Temp

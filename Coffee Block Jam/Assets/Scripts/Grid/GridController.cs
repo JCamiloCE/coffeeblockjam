@@ -10,23 +10,20 @@ namespace CoffeeBlockJam.Grid
         [SerializeField] private Sprite _floorSpriteB = null;
         private int _gridWidth = 1;
         private int _gridHeight = 1;
-        private List<ITray> _trays = null;
         private GridBuilder _gridBuilder = null;
         private TraysSectionBuilder _traySectionsBuilder = null;
         private TrayBuilder _trayBuilder = null;
 
-        public void BuildGridAndTrays(string dataInJson)
+        public void BuildGridAndTrays(GridDataJson dataInJson)
         {
-            GridDataJson loadedData = JsonUtility.FromJson<GridDataJson>(dataInJson);
-
-            _gridWidth = loadedData.width;
-            _gridHeight = loadedData.height;
+            _gridWidth = dataInJson.width;
+            _gridHeight = dataInJson.height;
             _gridBuilder = new ();
-            _gridBuilder.CreateGrid(_gridWidth, _gridHeight, loadedData.offsetX, loadedData.offsetY, transform, _floorSpriteA, _floorSpriteB);
+            _gridBuilder.CreateGrid(_gridWidth, _gridHeight, dataInJson.offsetX, dataInJson.offsetY, transform, _floorSpriteA, _floorSpriteB);
             _traySectionsBuilder = new ();
-            List<ITraySection> traySections = _traySectionsBuilder.CreateTraySections(loadedData, new TraySecionRulesImpl(), transform);
+            List<ITraySection> traySections = _traySectionsBuilder.CreateTraySections(dataInJson, new TraySecionRulesImpl(), transform);
             _trayBuilder = new ();
-            _trays = _trayBuilder.CreateTrays(traySections, transform);
+            _trayBuilder.CreateTrays(traySections, transform);
         }
     }
 }
