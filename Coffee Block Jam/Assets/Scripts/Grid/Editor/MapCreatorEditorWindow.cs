@@ -20,6 +20,7 @@ namespace CoffeeBlockJam.Grid.Editor
         private int _currentMarkID = 0;
         private bool _isValidGrid = false;
         private string _currentErrorInValidation = string.Empty;
+        private MapCreadorValidator _validator = new ();
 
         [MenuItem("Tools/MapCreatorEditorWindow")]
         public static void OpenMapCreatorWin()
@@ -250,14 +251,7 @@ namespace CoffeeBlockJam.Grid.Editor
             if (GUILayout.Button("Validate Grid"))
             {
                 _currentErrorInValidation = string.Empty;
-                _isValidGrid = false;
-                if (_marks == null || _marks.Count == 0)
-                {
-                    _currentErrorInValidation = "You need at least one Mark";
-                    return;
-                }
-
-                _isValidGrid = true;
+                _isValidGrid =_validator.AreMarksValid(_marks, out _currentErrorInValidation);
             }
             if (!string.IsNullOrEmpty(_currentErrorInValidation))
             {
@@ -265,6 +259,8 @@ namespace CoffeeBlockJam.Grid.Editor
                 GUILayout.Label("Error: " + _currentErrorInValidation);
             }
         }
+
+        
 
         private void ResetByChangeBaseConfiguration() 
         {

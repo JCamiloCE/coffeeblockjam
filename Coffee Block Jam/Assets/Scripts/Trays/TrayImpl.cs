@@ -23,6 +23,7 @@ namespace CoffeeBlockJam.Trays
             _rigidbody.isKinematic = true;
             _rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
             _rigidbody.useGravity = false;
+            _rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
 
         void ITray.AddTraySection(ITraySection traySection)

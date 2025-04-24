@@ -86,12 +86,13 @@ namespace CoffeeBlockJam.Grid
             GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.name = name;
             wall.layer = 2; //Ignore Raycast
-            wall.transform.localScale = new Vector3(xSize, _sizeSmall, _sizeSmall);
+            wall.transform.localScale = new Vector3(xSize, _sizeSmall, _sizeSmall*2);
             wall.AddComponent<BoxCollider>();
             var rigid = wall.AddComponent<Rigidbody>();
             rigid.isKinematic = true;
             rigid.useGravity = false;
             rigid.constraints = RigidbodyConstraints.FreezeAll;
+            rigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
             return wall;
         }
     }
