@@ -50,8 +50,21 @@ namespace CoffeeBlockJam.Trays
         void ITray.MoveToTouchPos(Vector3 _screenPosition)
         {
             Vector3 target = Camera.main.WorldToScreenPoint(transform.position - _delta);
-            Vector3 direction = (_screenPosition - target).normalized;
-            _rigidbody.velocity = (direction * _speed);
+            Vector3 direction = (_screenPosition - target);
+            float distance = Vector3.Distance(_screenPosition, target);
+            direction = new Vector3(direction.x, direction.y, 0f);
+            direction = direction.normalized;
+            _rigidbody.velocity = (direction * GetSpeed(distance));
+        }
+
+        private float GetSpeed(float distance) 
+        {
+            if (distance < 10) return 0f;
+            if (distance < 20) return _speed / 5f;
+            if (distance < 40) return _speed / 3f;
+            if (distance < 60) return _speed / 2f;
+            if (distance < 80) return _speed / 1.5f;
+            return _speed;
         }
     }
 }

@@ -22,8 +22,11 @@ namespace CoffeeBlockJam.Inputs
             if (Input.GetMouseButtonUp(0))
             {
                 _isDragging = false;
-                _currentTray.EndToMove();
-                _currentTray = null;
+                if (_currentTray != null) 
+                {
+                    _currentTray.EndToMove();
+                    _currentTray = null;
+                }
             }
 
             if (_isDragging)
@@ -45,7 +48,6 @@ namespace CoffeeBlockJam.Inputs
                 }
                 else {
                     _currentTray.MoveToTouchPos(_screenPosition);
-                    //_currentTray.MoveToTouchPos(_screenPosition);
                 }
             }
         }

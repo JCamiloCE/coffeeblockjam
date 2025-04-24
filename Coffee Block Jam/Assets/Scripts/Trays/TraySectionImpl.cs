@@ -20,10 +20,14 @@ namespace CoffeeBlockJam.Trays
             _traySectionColor = colorTraySection;
             _traySectionId = traySectionId;
 
-            for (int i = 0; i < _meshRender.materials.Length; i++)
+            if (Application.isPlaying) 
             {
-                _meshRender.materials[i].color = _traySectionColor;
+                for (int i = 0; i < _meshRender.materials.Length; i++)
+                {
+                    _meshRender.materials[i].color = _traySectionColor;
+                }
             }
+            
         }
 
         void ITraySection.SetParent(Transform parent)
