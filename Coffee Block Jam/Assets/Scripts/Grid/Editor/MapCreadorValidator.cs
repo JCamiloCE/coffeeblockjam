@@ -27,7 +27,7 @@ namespace CoffeeBlockJam.Grid.Editor
             Dictionary<(int, Color), List<CellDataJson>> groupedMarks = GetGroupedMarks(marks);
             List<List<CellDataJson>> disconnectedGroups = GetDisconnectedGroups(marks, groupedMarks);
             Debug.Log("disconnectedGroups.Count: " + disconnectedGroups.Count);
-            return disconnectedGroups.Count > 1;
+            return disconnectedGroups.Count > 0;
         }
 
         private Dictionary<(int, Color), List<CellDataJson>> GetGroupedMarks(List<CellDataJson> marks) 
