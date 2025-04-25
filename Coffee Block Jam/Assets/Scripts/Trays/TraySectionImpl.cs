@@ -14,6 +14,7 @@ namespace CoffeeBlockJam.Trays
         ETypeTray ITraySection.GetTypeTray() => _typeTray;
         Color ITraySection.GetColorTray() => _traySectionColor;
         int ITraySection.GetIdTray() => _traySectionId;
+        Vector3 ITraySection.GetPosition() => transform.position;
 
         void ITraySection.SetTraySectionData(Color colorTraySection, int traySectionId)
         {
@@ -27,7 +28,6 @@ namespace CoffeeBlockJam.Trays
                     _meshRender.materials[i].color = _traySectionColor;
                 }
             }
-            
         }
 
         void ITraySection.SetParent(Transform parent)

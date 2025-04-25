@@ -23,7 +23,7 @@ namespace CoffeeBlockJam.Grid
             _traySectionsBuilder = new ();
             List<ITraySection> traySections = _traySectionsBuilder.CreateTraySections(dataInJson, new TraySecionRulesImpl(), transform);
             _trayBuilder = new ();
-            _trayBuilder.CreateTrays(traySections, transform);
+            _trayBuilder.CreateTrays(dataInJson, traySections, transform);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace CoffeeBlockJam.Inputs
                 _isDragging = false;
                 if (_currentTray != null) 
                 {
-                    _currentTray.EndToMove();
+                    _currentTray.EndToMove(_screenPosition);
                     _currentTray = null;
                 }
             }
