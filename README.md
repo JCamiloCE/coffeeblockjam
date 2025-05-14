@@ -1,5 +1,9 @@
 <h1 align="center"> Coffee Block Jam </h1>
-![Demo](ReadmeFiles/demo.gif)
+
+<p align="center">
+  <img src="ReadmeFiles/Demo.gif" alt="Demo del Proyecto"/>
+</p>
+
 <h4 align="center">
 :construction: Project under development :construction:
 </h4>
